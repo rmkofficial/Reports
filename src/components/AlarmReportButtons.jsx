@@ -1,8 +1,6 @@
-import { Grid, Button, Link } from "@mui/material";
-import { SaveAlt as SaveAltIcon } from "@mui/icons-material";
+import { Grid, Link } from "@mui/material";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import PropTypes from "prop-types";
@@ -55,44 +53,6 @@ const exportToPdf = (data, filename) => {
   doc.save(filename);
 };
 
-const exportToWord = (data, filename) => {
-  const doc = new Document();
-  const table = data.map((row) => {
-    return new Paragraph({
-      children: [
-        new TextRun({ text: row.id.toString(), bold: true }),
-        new TextRun(` ${row.name}`),
-        new TextRun(` ${row.checkInDate}`),
-        new TextRun(` ${row.checkOutDate}`),
-        new TextRun(` ${row.status}`),
-      ],
-    });
-  });
-
-  doc.addSection({
-    children: [
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: "Hotel Data Report",
-            bold: true,
-            size: 24,
-          }),
-        ],
-      }),
-      ...table,
-    ],
-  });
-
-  Packer.toBlob(doc)
-    .then((blob) => {
-      saveAs(blob, filename);
-    })
-    .catch((err) => {
-      console.error("Error:", err);
-    });
-};
-
 const exportToXls = (data, filename) => {
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
@@ -103,7 +63,6 @@ const exportToXls = (data, filename) => {
 const downloadAllFormats = (data) => {
   exportToCsv(data, "hotel_data.csv");
   exportToPdf(data, "hotel_data.pdf");
-  exportToWord(data, "hotel_data.docx");
   exportToXls(data, "hotel_data.xlsx");
 };
 
@@ -111,74 +70,30 @@ const AlarmReportButtons = ({ dateRange }) => {
   const filteredData = filterDataByDateRange(hotelData, dateRange);
 
   return (
-    <Grid container spacing={1} alignItems="center">
+    <Grid container spacing={2} alignItems="center">
       <Grid item>
-        <Button
-          variant="contained"
-          startIcon={<SaveAltIcon />}
-          size="small"
-          sx={{
-            backgroundColor: "#4CAF50",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#45A049",
-            },
-          }}
+        <img
+          src="/icons/CSV.png"
+          alt="CSV Icon"
+          style={{ width: "40px", cursor: "pointer" }}
           onClick={() => exportToCsv(filteredData, "hotel_data.csv")}
-        >
-          CSV
-        </Button>
+        />
       </Grid>
       <Grid item>
-        <Button
-          variant="contained"
-          startIcon={<SaveAltIcon />}
-          size="small"
-          sx={{
-            backgroundColor: "#2196F3",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#1976D2",
-            },
-          }}
+        <img
+          src="/icons/PDF.png"
+          alt="PDF Icon"
+          style={{ width: "40px", cursor: "pointer" }}
           onClick={() => exportToPdf(filteredData, "hotel_data.pdf")}
-        >
-          PDF
-        </Button>
+        />
       </Grid>
       <Grid item>
-        <Button
-          variant="contained"
-          startIcon={<SaveAltIcon />}
-          size="small"
-          sx={{
-            backgroundColor: "#F44336",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#D32F2F",
-            },
-          }}
-          onClick={() => exportToWord(filteredData, "hotel_data.docx")}
-        >
-          Word
-        </Button>
-      </Grid>
-      <Grid item>
-        <Button
-          variant="contained"
-          startIcon={<SaveAltIcon />}
-          size="small"
-          sx={{
-            backgroundColor: "#FF9800",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#FB8C00",
-            },
-          }}
+        <img
+          src="/icons/XLS.png"
+          alt="XLS Icon"
+          style={{ width: "40px", cursor: "pointer" }}
           onClick={() => exportToXls(filteredData, "hotel_data.xlsx")}
-        >
-          XLS
-        </Button>
+        />
       </Grid>
       <Grid item>
         <Link
